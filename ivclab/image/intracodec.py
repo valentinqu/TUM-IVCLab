@@ -14,6 +14,12 @@ class IntraCodec:
                  end_of_block = 4000,
                  block_shape = (8,8)
                  ):
+        
+        self.quantization_scale = quantization_scale
+        self.bounds = bounds
+        self.end_of_block = end_of_block
+        self.block_shape = block_shape
+
         self.dct = DiscreteCosineTransform()
         self.quant = PatchQuant(quantization_scale=quantization_scale)
         self.zigzag = ZigZag()
