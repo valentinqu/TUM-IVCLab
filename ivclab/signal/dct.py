@@ -22,7 +22,7 @@ class DiscreteCosineTransform:
         """
 
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+
         # YOUR CODE ENDS HERE
         return transformed
     
@@ -38,6 +38,6 @@ class DiscreteCosineTransform:
             patched_img: np.array of shape [H_patch, W_patch, C, H_window, W_window]
         """
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+
         # YOUR CODE ENDS HERE
         return patched_img

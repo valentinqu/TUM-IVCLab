@@ -13,7 +13,7 @@ def calc_mse(orig: np.array, rec: np.array):
         mse: a scalar value
     """
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+
     # YOUR CODE ENDS HERE
     return mse
 
@@ -32,6 +32,6 @@ def calc_psnr(orig: np.array, rec:np.array, maxval=255):
         psnr: a scalar value
     """
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+    
     # YOUR CODE ENDS HERE
     return psnr

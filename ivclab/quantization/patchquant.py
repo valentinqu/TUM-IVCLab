@@ -54,7 +54,10 @@ class PatchQuant:
             quantized_img: np.array of shape [H_patch, W_patch, C, H_window, W_window]
         """
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        
+
+
+
         # YOUR CODE ENDS HERE
         return quantized_img.astype(np.int32)
     
@@ -71,6 +74,9 @@ class PatchQuant:
             patched_img: np.array of shape [H_patch, W_patch, C, H_window, W_window]
         """
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        
+
+
+        
         # YOUR CODE ENDS HERE
         return quantized_img

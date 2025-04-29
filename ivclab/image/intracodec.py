@@ -1,7 +1,7 @@
 import numpy as np
 from ivclab.entropy import ZeroRunCoder
 from ivclab.quantization import PatchQuant
-from ivclab.utils import ZigZag
+from ivclab.utils import ZigZag, Patcher
 from ivclab.signal import DiscreteCosineTransform
 from ivclab.entropy import HuffmanCoder, stats_marg
 from ivclab.signal import rgb2ycbcr, ycbcr2rgb
@@ -25,8 +25,9 @@ class IntraCodec:
         self.zigzag = ZigZag()
         self.zerorun = ZeroRunCoder(end_of_block=end_of_block, block_size= block_shape[0] * block_shape[1])
         self.huffman = HuffmanCoder(lower_bound=bounds[0])
+        self.patcher = Patcher()
 
-    def image2symbols(self, img: np.array):
+    def image2symbols(self, img: np.array, is_source_rgb=True):
         """
         Computes the symbol representation of an image by applying rgb2ycbcr,
         DCT, Quantization, ZigZag and ZeroRunEncoding in order.
@@ -37,7 +38,16 @@ class IntraCodec:
             symbols: List of integers
         """
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        
+
+
+
+
+
+
+
+
+
         # YOUR CODE ENDS HERE
         return symbols
     
@@ -57,11 +67,19 @@ class IntraCodec:
         """
         patch_shape = [original_shape[0] // 8, original_shape[1] // 8, original_shape[2]]
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        
+
+
+
+
+
+
+
+
         # YOUR CODE ENDS HERE
         return reconstructed_img
     
-    def train_huffman_from_image(self, training_img):
+    def train_huffman_from_image(self, training_img, is_source_rgb=True):
         """
         Finds the symbols representing the image, extracts the 
         probability distribution of them and trains the huffman coder with it.
@@ -72,10 +90,16 @@ class IntraCodec:
             Nothing
         """
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        
+
+
+
+
+
+
         # YOUR CODE ENDS HERE
 
-    def intra_encode(self, img: np.array):
+    def intra_encode(self, img: np.array, return_bpp = False, is_source_rgb=True):
         """
         Encodes an image to a bitstream and return it by converting it to
         symbols and compressing them with the Huffman coder.
@@ -86,7 +110,13 @@ class IntraCodec:
             bitstream: List of integers produced by the Huffman coder
         """
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        
+
+
+
+
+
+
         # YOUR CODE ENDS HERE
         return bitstream
     
@@ -103,7 +133,25 @@ class IntraCodec:
 
         """
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        
+
+
+
+
         # YOUR CODE ENDS HERE
         return reconstructed_img
-        
+    
+if __name__ == "__main__":
+    from ivclab.utils import imread,calc_psnr
+    import matplotlib.pyplot as plt
+
+    lena = imread(f'data/lena.tif')
+    lena_small = imread(f'data/lena_small.tif')
+    intracodec = IntraCodec(quantization_scale=0.15)
+    intracodec.train_huffman_from_image(lena_small)
+    symbols, bitsize = intracodec.intra_encode(lena, return_bpp=True)
+    print(len(symbols))
+    reconstructed_img = intracodec.intra_decode(symbols, lena.shape)
+    psnr = calc_psnr(lena, reconstructed_img)
+    print(f"PSNR: {psnr:.4f} dB, bpp: {bitsize / (lena.size / 3)}")
+    

@@ -1,10 +1,11 @@
 from ivclab.utils import imread, calc_psnr
-from ivclab.signal import FilterPipeline, kernel_order_40
+from ivclab.signal import FilterPipeline
 import numpy as np
 
 image = imread('data/satpic1.bmp')
 
-pipeline = FilterPipeline(kernel=kernel_order_40)
+lowpass_kernel = ...
+pipeline = FilterPipeline(kernel=lowpass_kernel)
 
 recon_image_not_pre = pipeline.filter_img(image, False)
 recon_image_pre = pipeline.filter_img(image, True)

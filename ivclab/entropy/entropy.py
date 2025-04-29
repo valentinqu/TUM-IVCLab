@@ -19,7 +19,7 @@ def stats_marg(image, pixel_range):
     image = image * 1.0
 
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+
     # YOUR CODE ENDS HERE
     return pmf
 
@@ -38,7 +38,7 @@ def calc_entropy(pmf, eps=1e-8):
     pmf = pmf + eps
     
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+
     # YOUR CODE ENDS HERE
     return entropy
 
@@ -60,6 +60,6 @@ def min_code_length(target_pmf, common_pmf, eps=1e-8):
     common_pmf = common_pmf + eps
     
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+
     # YOUR CODE ENDS HERE
     return code_length

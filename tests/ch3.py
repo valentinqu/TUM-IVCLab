@@ -1,73 +1,50 @@
 import unittest
 import numpy as np
-from ivclab.utils import imread, calc_psnr
-from ivclab.quantization.quantizers import lloyd_max, inv_lloyd_max, uniquant, inv_uniquant, vector_quantizer, inv_vector_quantizer, apply_vector_quantizer
-from ivclab.entropy.huffman import HuffmanCoder
+from ivclab.utils import imread
+from ivclab.utils import Patcher
+from ivclab.signal import DiscreteCosineTransform
+from ivclab.quantization import PatchQuant
+from ivclab.utils import calc_psnr
+from ivclab.utils.metrics import calc_mse
 
-class TestMeasurements(unittest.TestCase):
+class TestDiscreteCosineTransform(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.orig_img = imread('data/lena.tif')
-        self.ref_img = imread('data/satpic1.bmp')
+        self.orig_img = imread('data/satpic1.bmp')
+        self.patcher = Patcher(window_size = (8,8))
+        self.dct = DiscreteCosineTransform(norm = 'ortho')
         return super().setUp()
-
-    def test_correct_psnr_uniquant(self) -> None:
-        qImage_orig = uniquant(self.orig_img, 4)
-        qImage_ref = uniquant(self.ref_img, 5)
-
-        recImage_orig = inv_uniquant(qImage_orig, 4)
-        recImage_ref = inv_uniquant(qImage_ref, 5)
-        
-        psnr_orig = calc_psnr(recImage_orig, self.orig_img)
-        psnr_ref = calc_psnr(recImage_ref, self.ref_img)
-        self.assertAlmostEqual(psnr_orig, 34.69, delta=0.2)
-        self.assertAlmostEqual(psnr_ref, 40.72, delta=0.2)
-
-        
-    def test_correct_psnr_lloydmax(self) -> None:
-        qImage_orig, clusters_orig = lloyd_max(self.orig_img, 4, 1e-5)
-        qImage_ref, clusters_ref = lloyd_max(self.ref_img, 5, 1e-5)
-
-        recImage_orig = inv_lloyd_max(qImage_orig, clusters_orig)
-        recImage_ref = inv_lloyd_max(qImage_ref, clusters_ref)
-        
-        psnr_orig = calc_psnr(recImage_orig, self.orig_img)
-        psnr_ref = calc_psnr(recImage_ref, self.ref_img)
-        self.assertAlmostEqual(psnr_orig, 35.44, delta=0.2)
-        self.assertAlmostEqual(psnr_ref, 41.05, delta=0.2)
     
-    def test_correct_cluster_lloydmax(self) -> None:
-        pass
+    def test_forward_transform(self) -> None:
+        patched_img = self.patcher.patch(self.orig_img)
+        transformed = self.dct.transform(patched_img)
+        self.assertAlmostEqual(np.mean(transformed**2), 10616, delta=100)
 
-    @staticmethod
-    def vq_pipeline():
-        img_small = imread('data/lena_small.tif')
-        clusters, _ = vector_quantizer(img_small, 3, 0.1, 2)
-        qImage_small = apply_vector_quantizer(img_small, clusters, 2)
+    def test_inverse_transform(self) -> None:
+        patched_img = self.patcher.patch(self.orig_img)
+        transformed = self.dct.transform(patched_img)
+        reconstructed_patched = self.dct.inverse_transform(transformed)
+        self.assertTrue(np.allclose(reconstructed_patched, patched_img))
 
-        pmf = np.histogram(qImage_small.flatten(), bins=np.arange(0, 2**3 + 1), density=True)[0]
+class TestPatchQuant(unittest.TestCase):
 
-        huffman_coder = HuffmanCoder(lower_bound=0)
-        huffman_coder.train(probs=pmf)
+    def setUp(self) -> None:
+        self.orig_img = imread('data/satpic1.bmp')
+        self.patcher = Patcher(window_size = (8,8))
+        self.quantizer = PatchQuant(quantization_scale=1.0)
+        return super().setUp()
+    
+    def test_quantization(self) -> None:
+        patched_img = self.patcher.patch(self.orig_img)
+        quantized = self.quantizer.quantize(patched_img)
+        self.assertAlmostEqual(np.mean(quantized**2), 7.5409901936848955, delta=0.1)
 
-        img_lena = imread('data/lena.tif')
-        qImage = apply_vector_quantizer(img_lena, clusters, 2)
-
-        bytestream, bitrate = huffman_coder.encode(qImage.flatten())
-        k_rec = huffman_coder.decode(bytestream, qImage.size) 
-
-        qReconst_image = k_rec.reshape(qImage.shape)
-        return inv_vector_quantizer(qReconst_image, clusters, 2)
-
-    def test_correct_psnr_vq(self) -> None:
-
-        recImage_orig = self.vq_pipeline()
-        #recImage_ref = self.vq_pipeline(self.ref_img)
-        
-        psnr_orig = calc_psnr(recImage_orig, self.orig_img)
-        #psnr_ref = calc_psnr(recImage_ref, self.ref_img)
-        self.assertAlmostEqual(psnr_orig, 26.62, delta=0.2)
-        #self.assertAlmostEqual(psnr_ref, 41.05, delta=0.2)
-
+    def test_dequantization(self) -> None:
+        patched_img = self.patcher.patch(self.orig_img)
+        quantized = self.quantizer.quantize(patched_img)
+        dequantized = self.quantizer.dequantize(quantized)
+        reconstructed = self.patcher.unpatch(dequantized)
+        self.assertAlmostEqual(calc_mse(self.orig_img, reconstructed), 348.2207400004069, delta=5)
+    
 if __name__ == '__main__':
     unittest.main()

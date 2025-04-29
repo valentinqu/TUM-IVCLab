@@ -46,7 +46,7 @@ class TestPredictive(unittest.TestCase):
     
     def test_correct_single_pixel_predictor_coding(self) -> None:
         residual_image = single_pixel_predictor(self.orig_img)
-        pmf = stats_marg(residual_image, np.arange(-256,256))
+        pmf = stats_marg(residual_image, np.arange(-255,255))
         entropy = calc_entropy(pmf)
         self.assertAlmostEqual(entropy, 5.67565776280646, delta=0.2)
 

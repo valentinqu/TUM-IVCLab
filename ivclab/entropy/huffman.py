@@ -37,12 +37,14 @@ class HuffmanCoder:
             decoded.append(symbol + self.lower_bound)
         
         return np.asarray(decoded)
-    
+
 if __name__ == '__main__':
     huffman = HuffmanCoder()
-    huffman.train(np.array([0.3, 0.2, 0.4, 0.1], dtype=np.float32))
+    # huffman.train(np.array([0.3, 0.2, 0.4, 0.1], dtype=np.float32))
+    huffman.train(np.array([0.5, 0.25, 0.25], dtype=np.float32))
 
-    message = np.asarray([1, 3, 2, 3, 0, 1, 3, 0, 2, 1, 1, 3, 3, 1, 2, 0, 1, 3, 1])
+    # message = np.asarray([1, 3, 2, 3, 0, 1, 3, 0, 2, 1, 1, 3, 3, 1, 2, 0, 1, 3, 1])
+    message = np.asarray([0, 2, 1, 2, 1, 0, 2, 0, 1, 0, 0, 2, 2, 0, 1, 0, 0, 2, 0])
     compressed, bitrate = huffman.encode(message)
 
     print(f"Compressed: {compressed}")

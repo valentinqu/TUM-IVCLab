@@ -26,7 +26,7 @@ def stats_joint(image, pixel_range):
     pixel_pairs = rearrange(image, 'h (w s) c -> (h w c) s', s=2)
 
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+    
     # YOUR CODE ENDS HERE
     return pmf
 
@@ -54,7 +54,8 @@ def stats_cond(image, pixel_range, eps=1e-8):
     pixel_pairs = rearrange(sliding_window_view(image, 2, axis=1), 'h w c s-> (h w c) s', s=2) 
 
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+    
 
+    
     # YOUR CODE ENDS HERE
     return cond_entropy

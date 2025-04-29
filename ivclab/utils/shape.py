@@ -20,13 +20,13 @@ class ZigZag:
 
     def flatten(self, patched_img: np.array):
         flattened = rearrange(patched_img, 'h w c p0 p1 -> h w c (p0 p1)')
-        shuffled = flattened[:,:,:,self.zigzag_order]
+        shuffled = np.zeros_like(flattened)
+        shuffled[:,:,:,self.zigzag_order] = flattened
         return shuffled
 
-    def unflatten(self, flat_img):
-        unshuffled = np.zeros_like(flat_img)
-        unshuffled[:,:,:,self.zigzag_order] = flat_img
-        unflattened = rearrange(unshuffled, 'h w c (p0 p1) -> h w c p0 p1', p0=8, p1=8)
+    def unflatten(self, unshuffled):
+        shuffled = unshuffled[:,:,:,self.zigzag_order]
+        unflattened = rearrange(shuffled, 'h w c (p0 p1) -> h w c p0 p1', p0=8, p1=8)
         return unflattened
 
 class Patcher:

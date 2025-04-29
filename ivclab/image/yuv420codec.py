@@ -25,7 +25,8 @@ def yuv420compression(image: np.ndarray):
     image = image * 1.0
 
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+
+    
     #YOUR CODE ENDS HERE
 
     # Cast output to integer again

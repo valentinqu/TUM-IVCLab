@@ -23,19 +23,37 @@ class ZeroRunCoder:
             encoded: List of symbols that represent the original elements
         
         """
-        flat_img = rearrange(flat_patch_img, 'h w c p -> (h w c) p', p=self.block_size)
+        flat_img = rearrange(flat_patch_img, 'h w c p-> (h w c) p', p=self.block_size)
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # YOUR CODE ENDS HERE
+        encoded = np.array(encoded, dtype=np.int32)
         return encoded
     
-    def decode(self, encoded, patch_shape):
+    def decode(self, encoded, original_shape):
         """
         This function gets an encoding and the original shape to decode the elements 
-        of the original array. It acts as the inverse function of the decoder.
+        of the original array. It acts as the inverse function of the encoder.
 
         encoded: List of symbols that represent the original elements
-        patch_shape: List of 3 numbers that represent number of H_patch, W_patch and C
+        original_shape: List of 3 numbers that represent number of H_patch, W_patch and C
 
         returns:
             flat_patch_img: np.array of shape [H_patch, W_patch, C, Block_size]
@@ -43,15 +61,32 @@ class ZeroRunCoder:
         """
         
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
-        # YOUR CODE ENDS HERE
+        
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        # YOUR CODE ENDS HERE
         flat_patch_img = rearrange(
-            flat_img, 
+            flat_img,
             '(h w c) p -> h w c p', 
             h = original_shape[0], w = original_shape[1], 
             c = original_shape[2], p=self.block_size)
         return flat_patch_img
 
-        
-        
+            
+            

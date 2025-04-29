@@ -24,7 +24,8 @@ def single_pixel_predictor(image):
     residual_image = np.zeros_like(image)
 
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+
+
     # YOUR CODE ENDS HERE
 
     residual_image = np.round(np.clip(residual_image, -255, 255))
@@ -64,7 +65,16 @@ def _predict_from_neighbors(original, coefficients):
     residual_error = np.copy(reconstruction)
 
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+    
+
+
+
+
+
+
+
+
+
     # YOUR CODE STARTS HERE
 
     return residual_error
@@ -93,7 +103,23 @@ def three_pixels_predictor(image, subsample_color_channels=False):
     coefficients_CbCr = [3/8, -2/8, 7/8]
 
     # YOUR CODE STARTS HERE
-    raise NotImplementedError()
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     # YOUR CODE ENDS HERE
 
     residual_image_Y = np.round(np.clip(residual_image_Y, -255, 255)).astype(np.int32)
