@@ -6,6 +6,7 @@ class MotionCompensator:
         self.search_range = search_range
 
     def compute_motion_vector(self, ref_image, image):
+
         """
         Computes the motion vector that describes the motion between the single channeled reference image and the current image.
         The motion vector is represented as a 2D numpy array with shape [H / 8, W / 8, 1], where the x and y displacements
@@ -20,6 +21,7 @@ class MotionCompensator:
             motion_vector: np.array of shape [H / 8, W / 8, 1]
         """
         # YOUR CODE STARTS HERE
+
        
 
 
@@ -42,6 +44,7 @@ class MotionCompensator:
         return motion_vector.astype(int)
     
     def reconstruct_with_motion_vector(self, ref_image, motion_vector):
+
         """
         Reconstructs the current image using the reference image and the motion vector. The motion vector is used to
         displace the 8x8 blocks in the reference image to their corresponding positions in the current image.
@@ -56,13 +59,6 @@ class MotionCompensator:
         image = np.zeros_like(ref_image)
 
         # YOUR CODE STARTS HERE
-        
-
-
-
-
-
-        
-
+        raise NotImplementedError()
         # YOUR CODE ENDS HERE
         return image
