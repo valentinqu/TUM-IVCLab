@@ -42,8 +42,9 @@ def lowpass_filter(image, kernel):
     filtered = np.zeros_like(image)
 
     # YOUR CODE STARTS HERE
-    
-
+    kernel = kernel / np.sum(kernel)
+    for c in range(image.shape[2]):
+        filtered[:, :, c] = convolve2d(image[:, :, c], kernel, mode='same', boundary='symm')
     # YOUR CODE ENDS HERE
     return filtered
 
@@ -71,13 +72,16 @@ class FilterPipeline:
         image = image * 1.0
 
         # YOUR CODE STARTS HERE
+        if prefilter:
+            image = lowpass_filter(image, self.kernel)
 
+        image_ds = downsample(image)  # horizontal
+        image_ds = downsample(image_ds.transpose(1, 0, 2)).transpose(1, 0, 2)  # vertical
 
+        image_us = upsample(image_ds)  # horizontal
+        image_us = upsample(image_us.transpose(1, 0, 2)).transpose(1, 0, 2)  # vertical
 
-
-
-
-
+        output = lowpass_filter(image_us, self.kernel)
         #YOUR CODE ENDS HERE
 
         # Cast output to integer again

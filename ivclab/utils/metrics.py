@@ -13,7 +13,8 @@ def calc_mse(orig: np.array, rec: np.array):
         mse: a scalar value
     """
     # YOUR CODE STARTS HERE
-
+    diff = orig.astype(np.float32) - rec.astype(np.float32)
+    mse = np.mean(np.square(diff))
     # YOUR CODE ENDS HERE
     return mse
 
@@ -32,6 +33,10 @@ def calc_psnr(orig: np.array, rec:np.array, maxval=255):
         psnr: a scalar value
     """
     # YOUR CODE STARTS HERE
-    
+    mse = calc_mse(orig, rec)
+    if mse == 0:
+        psnr = float('inf')  # Perfect reconstruction
+    else:
+        psnr = 10 * np.log10((maxval ** 2) / mse)
     # YOUR CODE ENDS HERE
     return psnr

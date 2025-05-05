@@ -2,7 +2,7 @@ from ivclab.utils import imread, calc_psnr
 from ivclab.signal import FilterPipeline
 import numpy as np
 
-image = imread('data/satpic1.bmp')
+image = imread('D:/Pycharm/ivclab/data/satpic1.bmp')
 
 kernel = np.asarray(
     [[1,2,1],
