@@ -8,7 +8,12 @@ img_lena = imread('D:/Pycharm/ivclab/data/lena.tif')
 img_lena_gray = rgb2gray(img_lena)
 
 img_smandril = imread('D:/Pycharm/ivclab/data/smandril.tif')
-img_smandril_gray = rgb2gray(img_smandril)
+img_smandril_gray = imread('D:/Pycharm/ivclab/data/smandril_rec.tif')
+
+mse = calc_mse(img_smandril, img_smandril_gray)
+psnr = calc_psnr(img_smandril, img_smandril_gray)
+print(f'MSE of lena.tif is {mse:.3f}')
+print(f'PSNR of lena.tif is {psnr:.3f} dB')
 
 
 # plot images
