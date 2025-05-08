@@ -1,17 +1,23 @@
-from ivclab.utils import imread, calc_psnr
-from ivclab.signal import FilterPipeline
 import numpy as np
+from ivclab.utils import imread
+from ivclab.signal import rgb2ycbcr
+from scipy.signal import resample
 
-image = imread('data/satpic1.bmp')
+image = imread('data/sail.tif')
 
-lowpass_kernel = ...
-pipeline = FilterPipeline(kernel=lowpass_kernel)
+# RGB → YCbCr
+ycbcr = rgb2ycbcr(image)
+Y, Cb, Cr = ycbcr[..., 0], ycbcr[..., 1], ycbcr[..., 2]
 
-recon_image_not_pre = pipeline.filter_img(image, False)
-recon_image_pre = pipeline.filter_img(image, True)
+# Assume Cb is a chroma plane
+H, W = Cb.shape
 
-psnr_not_pre = calc_psnr(image, recon_image_not_pre)
-psnr_pre = calc_psnr(image, recon_image_pre)
+# Pad manually
+Cb_padded = np.pad(Cb, ((4, 4), (4, 4)), mode='symmetric')
 
-print(f"Reconstructed image, not prefiltered, PSNR = {psnr_not_pre:.2f} dB")
-print(f"Reconstructed image, prefiltered, PSNR = {psnr_pre:.2f} dB")
+# Resample
+Cb_half_w = resample(Cb_padded, num=Cb_padded.shape[1] // 2, axis=1)  # horizontal
+Cb_half_hw = resample(Cb_half_w, num=Cb_half_w.shape[0] // 2, axis=0)  # vertical
+
+# Crop manually
+Cb_result = np.round(Cb_half_hw[2:-2, 2:-2])
