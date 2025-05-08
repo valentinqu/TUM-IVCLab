@@ -41,8 +41,8 @@ print(f"Reconstructed image, not prefiltered, PSNR = {psnr_not_pre:.2f} dB")
 print(f"Reconstructed image, prefiltered, PSNR = {psnr_pre:.2f} dB")
 
 fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-imshow(axs[0], recon_image_not_pre, title='Filtered Image')
-imshow(axs[1], recon_image_pre, title='Downsampled (1/4 size)')
+imshow(axs[0], recon_image_not_pre, title='Image without prefilter')
+imshow(axs[1], recon_image_pre, title='Image with prefilter')
 plt.show()
 
 

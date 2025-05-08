@@ -76,9 +76,10 @@ class FilterPipeline:
             image = lowpass_filter(image, self.kernel)
 
         image_ds = downsample(image)
-        image_ds = downsample(image_ds.transpose(1, 0, 2)).transpose(1, 0, 2)
+        #image_ds = downsample(image_ds.transpose(1, 0, 2)).transpose(1, 0, 2)
+        image_ds = image_ds * 4
         image_us = upsample(image_ds)
-        image_us = upsample(image_us.transpose(1, 0, 2)).transpose(1, 0, 2)
+        #image_us = upsample(image_us.transpose(1, 0, 2)).transpose(1, 0, 2)
         output = lowpass_filter(image_us, self.kernel)
         #YOUR CODE ENDS HERE
 
