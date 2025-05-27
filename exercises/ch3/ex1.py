@@ -11,14 +11,27 @@ import matplotlib.pyplot as plt
 # - Measure bitrate and PSNR on lena
 # Plot all the measurements in a Rate Distortion plot
 
-lena = imread(f'data/lena.tif')
-lena_small = imread(f'data/lena_small.tif')
+lena = imread(f'D:/Pycharm/ivclab/data/lena.tif')
+lena_small = imread(f'D:/Pycharm/ivclab/data/lena_small.tif')
 H, W, C = lena.shape
 all_PSNRs = list()
 all_bpps = list()
 
 # YOUR CODE STARTS HERE
+quantization_scales = [0.15,0.3,0.7,1.0,1.5,3,5,7,10]
+for q in quantization_scales:
+    intracodec = IntraCodec(quantization_scale=q, bounds=(-255, 255))
 
+    intracodec.train_huffman_from_image(lena_small)
+
+    symbols, bitsize = intracodec.intra_encode(lena, return_bpp=True)
+    reconstructed_img = intracodec.intra_decode(symbols, lena.shape)
+
+    psnr = calc_psnr(lena, reconstructed_img)
+    bpp = bitsize / (H * W)
+
+    all_PSNRs.append(psnr)
+    all_bpps.append(bpp)
 # YOUR CODE ENDS HERE
 
 all_bpps = np.array(all_bpps)

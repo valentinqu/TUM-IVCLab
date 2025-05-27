@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.signal import decimate, resample
-from ivclab.signal import rgb2gray, rgb2ycbcr, ycbcr2rgb
+from ivclab.signal.color import rgb2ycbcr, ycbcr2rgb
 
 def yuv420compression(image: np.ndarray):
     """
@@ -26,34 +26,54 @@ def yuv420compression(image: np.ndarray):
     image = image * 1.0
 
     # YOUR CODE STARTS HERE
-    ycbcr = rgb2ycbcr(image)
-    Y, Cb, Cr = ycbcr[:, :, 0], ycbcr[:, :, 1], ycbcr[:, :, 2]
+    # Convert RGB to YCbCr
+    yuv_image = rgb2ycbcr(image)
 
-    pad = ((4, 4), (4, 4))
-    Cb_pad = np.pad(Cb, pad, mode='symmetric')
-    Cr_pad = np.pad(Cr, pad, mode='symmetric')
+    # Split the channels
+    Y, Cb, Cr = yuv_image[:, :, 0], yuv_image[:, :, 1], yuv_image[:, :, 2]
 
-    Cb_ds = decimate(decimate(Cb_pad, 2, axis=1, ftype='iir'), 2, axis=0, ftype='iir')
-    Cr_ds = decimate(decimate(Cr_pad, 2, axis=1, ftype='iir'), 2, axis=0, ftype='iir')
+    # Pad the image with 4 symmetric pixels on each side
+    Y_padded = np.pad(Y, 2, mode='reflect')
+    Cb_padded = np.pad(Cb, 2, mode='reflect')
+    Cr_padded = np.pad(Cr, 2, mode='reflect')
 
-    Y_crop = Y[2:-2, 2:-2]
+    # Downsample Cb and Cr channels using decimate
+    Cb_downsampled = decimate(Cb_padded, 2, axis=0)
+    Cb_downsampled = decimate(Cb_downsampled, 2, axis=1)
+    Cr_downsampled = decimate(Cr_padded, 2, axis=0)
+    Cr_downsampled = decimate(Cr_downsampled, 2, axis=1)
 
-    Y_round = np.round(Y_crop)
-    Cb_ds = np.round(Cb_ds)
-    Cr_ds = np.round(Cr_ds)
+    # Crop 2 pixels from each side
+    Y_cropped = Y_padded[2:-2, 2:-2]
+    Cb_cropped = Cb_downsampled[2:-2, 2:-2]
+    Cr_cropped = Cr_downsampled[2:-2, 2:-2]
 
-    Cb_pad2 = np.pad(Cb_ds, ((4, 4), (4, 4)), mode='symmetric')
-    Cr_pad2 = np.pad(Cr_ds, ((4, 4), (4, 4)), mode='symmetric')
+    # Rounding Y, Cb, and Cr channels
+    Y_rounded = np.round(Y_cropped)
+    Cb_rounded = np.round(Cb_cropped)
+    Cr_rounded = np.round(Cr_cropped)
 
-    target_shape = Y_round.shape
-    Cb_us = resample(resample(Cb_pad2, 2 * Cb_pad2.shape[0], axis=0), 2 * Cb_pad2.shape[1], axis=1)
-    Cr_us = resample(resample(Cr_pad2, 2 * Cr_pad2.shape[0], axis=0), 2 * Cr_pad2.shape[1], axis=1)
+    # Pad the rounded channels with 4 symmetric pixels on each side
+    Y_padded = np.pad(Y_rounded, 2, mode='reflect')
+    Cb_padded = np.pad(Cb_rounded, 2, mode='reflect')
+    Cr_padded = np.pad(Cr_rounded, 2, mode='reflect')
 
-    Cb_crop = Cb_us[2:-2, 2:-2]
-    Cr_crop = Cr_us[2:-2, 2:-2]
+    # Upsample Cb and Cr channels using resample
+    Cb_upsampled = resample(Cb_padded, Cb_padded.shape[0]*2, axis=0)
+    Cb_upsampled = resample(Cb_upsampled, Cb_padded.shape[1]*2, axis=1)
+    Cr_upsampled = resample(Cr_padded, Cr_padded.shape[0]*2, axis=0)
+    Cr_upsampled = resample(Cr_upsampled, Cr_padded.shape[1]*2, axis=1)
 
-    ycbcr_rec = np.stack([Y_round, Cb_crop, Cr_crop], axis=-1)
-    output = ycbcr2rgb(ycbcr_rec)
+    # Crop 2 pixels from each side of upsampled channels
+    Y_final = Y_padded[2:-2, 2:-2]
+    Cb_final = Cb_upsampled[2:-2, 2:-2]
+    Cr_final = Cr_upsampled[2:-2, 2:-2]
+
+    # Recombine channels
+    yuv_reconstructed = np.stack([Y_final, Cb_final, Cr_final], axis=-1)
+
+    # Convert back to RGB
+    output = ycbcr2rgb(yuv_reconstructed)
     #YOUR CODE ENDS HERE
 
     # Cast output to integer again

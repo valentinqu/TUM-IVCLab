@@ -8,7 +8,7 @@ from einops import rearrange
 # stats_joint function in ivclab.entropy.probability file.
 # You can run ch2 tests to make sure they are implemented correctly
 
-lena_img = imread(f'data/lena.tif')
+lena_img = imread(f'D:/Pycharm/ivclab/data/lena.tif')
 pixel_range = np.arange(256)
 joint_pmf = stats_joint(lena_img, pixel_range)
 joint_entropy = calc_entropy(joint_pmf)

@@ -22,7 +22,8 @@ class DiscreteCosineTransform:
         """
 
         # YOUR CODE STARTS HERE
-
+        transformed = dct(patched_img, axis=-1, norm=self.norm)  # first on width
+        transformed = dct(transformed, axis=-2, norm=self.norm)  # then on height
         # YOUR CODE ENDS HERE
         return transformed
     
@@ -38,6 +39,7 @@ class DiscreteCosineTransform:
             patched_img: np.array of shape [H_patch, W_patch, C, H_window, W_window]
         """
         # YOUR CODE STARTS HERE
-
+        patched_img = idct(transformed, axis=-2, norm=self.norm)  # first on height
+        patched_img = idct(patched_img, axis=-1, norm=self.norm)  # then on width
         # YOUR CODE ENDS HERE
         return patched_img

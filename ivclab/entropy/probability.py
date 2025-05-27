@@ -26,7 +26,14 @@ def stats_joint(image, pixel_range):
     pixel_pairs = rearrange(image, 'h (w s) c -> (h w c) s', s=2)
 
     # YOUR CODE STARTS HERE
-    
+    x = pixel_pairs[:, 0].flatten()
+    y = pixel_pairs[:, 1].flatten()
+
+    # Use np.histogram2d to count (x, y) pairs
+    count_table, _, _ = np.histogram2d(x, y, bins=[np.append(pixel_range, 256), np.append(pixel_range, 256)])
+
+    # Normalize to get PMF
+    pmf = count_table.flatten() / np.sum(count_table)
     # YOUR CODE ENDS HERE
     return pmf
 
@@ -50,11 +57,22 @@ def stats_cond(image, pixel_range, eps=1e-8):
     # A table to hold count of pixel pair occurences
     pmf_table = np.zeros((len(pixel_range), len(pixel_range)))
 
-    # Get all overlapping horizontal pixel pairs as an array of shape [N, 2]
-    pixel_pairs = rearrange(sliding_window_view(image, 2, axis=1), 'h w c s-> (h w c) s', s=2) 
+    pixel_pairs = rearrange(sliding_window_view(image, 2, axis=1), 'h w c s -> (h w c) s', s=2)
+
 
     # YOUR CODE STARTS HERE
-    
+    x = pixel_pairs[:, 0].flatten()
+    y = pixel_pairs[:, 1].flatten()
+
+    pmf_table, _, _ = np.histogram2d(x, y, bins=[np.append(pixel_range, 256), np.append(pixel_range, 256)])
+
+    pmf_xy = pmf_table / np.sum(pmf_table)
+    pmf_x = np.sum(pmf_xy, axis=1)
+
+    pmf_xy = pmf_xy + eps
+    pmf_x = pmf_x + eps
+
+    cond_entropy = -np.sum(pmf_xy * (np.log2(pmf_xy) - np.log2(pmf_x[:, None])))
 
     
     # YOUR CODE ENDS HERE

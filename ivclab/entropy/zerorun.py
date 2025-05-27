@@ -25,23 +25,27 @@ class ZeroRunCoder:
         """
         flat_img = rearrange(flat_patch_img, 'h w c p-> (h w c) p', p=self.block_size)
         # YOUR CODE STARTS HERE
+        encoded = []
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        for block in flat_img:
+            i = 0
+            while i < self.block_size:
+                if block[i] == 0:
+                    run_length = 0
+                    # 统计连续 0 的数量
+                    while i < self.block_size and block[i] == 0:
+                        run_length += 1
+                        i += 1
+                    if i == self.block_size:
+                        encoded.append(self.EOB)
+                    else:
+                        encoded.append(0)
+                        encoded.append(run_length)
+                else:
+                    encoded.append(block[i])
+                    i += 1
+            if block[-1] != 0:
+                encoded.append(self.EOB)
 
         # YOUR CODE ENDS HERE
         encoded = np.array(encoded, dtype=np.int32)
@@ -61,25 +65,31 @@ class ZeroRunCoder:
         """
         
         # YOUR CODE STARTS HERE
-        
+        decoded_blocks = []
+        block = []
+        i = 0
 
+        while i < len(encoded):
+            symbol = encoded[i]
+            if symbol == self.EOB:
+                while len(block) < self.block_size:
+                    block.append(0)
+                decoded_blocks.append(block)
+                block = []
+                i += 1
+            elif symbol == 0:
+                run_length = encoded[i + 1]
+                block.extend([0] * run_length)
+                i += 2
+            else:
+                block.append(symbol)
+                i += 1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
+        flat_img = np.array(decoded_blocks, dtype=np.int32)
+        flat_patch_img = rearrange(
+            flat_img,
+            '(h w c) p -> h w c p',
+            h=original_shape[0], w=original_shape[1], c=original_shape[2], p=self.block_size)
         # YOUR CODE ENDS HERE
         flat_patch_img = rearrange(
             flat_img,

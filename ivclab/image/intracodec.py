@@ -38,16 +38,17 @@ class IntraCodec:
             symbols: List of integers
         """
         # YOUR CODE STARTS HERE
-        
+        img = rgb2ycbcr(img)
 
+        patched = self.patcher.patch(img)
 
+        dct_patched = self.dct.transform(patched)
 
+        quantized = self.quant.quantize(dct_patched)
 
+        zigzagged = self.zigzag.flatten(quantized)
 
-
-
-
-
+        symbols = self.zerorun.encode(zigzagged)
         # YOUR CODE ENDS HERE
         return symbols
     
@@ -67,15 +68,15 @@ class IntraCodec:
         """
         patch_shape = [original_shape[0] // 8, original_shape[1] // 8, original_shape[2]]
         # YOUR CODE STARTS HERE
-        
+        decoded = self.zerorun.decode(symbols, patch_shape)
 
+        inverse_zigzag = self.zigzag.unflatten(decoded)
 
+        dequantized = self.quant.dequantize(inverse_zigzag)
 
+        idct_img = self.dct.inverse_transform(dequantized)
 
-
-
-
-
+        reconstructed_img = self.patcher.unpatch(idct_img)
         # YOUR CODE ENDS HERE
         return reconstructed_img
     
@@ -90,13 +91,10 @@ class IntraCodec:
             Nothing
         """
         # YOUR CODE STARTS HERE
-        
-
-
-
-
-
-
+        symbols = self.image2symbols(training_img, is_source_rgb=is_source_rgb)
+        pixel_range = np.arange(self.bounds[0], self.bounds[1])
+        pmf = stats_marg(symbols, pixel_range)
+        self.huffman.train(pmf)
         # YOUR CODE ENDS HERE
 
     def intra_encode(self, img: np.array, return_bpp = False, is_source_rgb=True):
@@ -110,13 +108,11 @@ class IntraCodec:
             bitstream: List of integers produced by the Huffman coder
         """
         # YOUR CODE STARTS HERE
-        
+        symbols = self.image2symbols(img, is_source_rgb=is_source_rgb)
+        bitstream, bitrate = self.huffman.encode(symbols)
 
-
-
-
-
-
+        if return_bpp:
+            return bitstream, bitrate
         # YOUR CODE ENDS HERE
         return bitstream
     
@@ -133,11 +129,8 @@ class IntraCodec:
 
         """
         # YOUR CODE STARTS HERE
-        
-
-
-
-
+        decoded = self.huffman.decode(bitstream, message_length=np.prod(original_shape))
+        reconstructed_img = self.symbols2image(decoded, original_shape)
         # YOUR CODE ENDS HERE
         return reconstructed_img
     
@@ -145,10 +138,11 @@ if __name__ == "__main__":
     from ivclab.utils import imread,calc_psnr
     import matplotlib.pyplot as plt
 
-    lena = imread(f'data/lena.tif')
-    lena_small = imread(f'data/lena_small.tif')
+    lena = imread(f'D:/Pycharm/ivclab/data/lena.tif')
+    lena_small = imread(f'D:/Pycharm/ivclab/data/lena_small.tif')
     intracodec = IntraCodec(quantization_scale=0.15)
     intracodec.train_huffman_from_image(lena_small)
+
     symbols, bitsize = intracodec.intra_encode(lena, return_bpp=True)
     print(len(symbols))
     reconstructed_img = intracodec.intra_decode(symbols, lena.shape)

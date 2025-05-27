@@ -1,23 +1,16 @@
 import numpy as np
-from ivclab.utils import imread
-from ivclab.signal import rgb2ycbcr
-from scipy.signal import resample
+from ivclab.image.yuv420codec import yuv420compression
+from ivclab.utils import imread, calc_psnr
 
-image = imread('data/sail.tif')
+# read images
+img_lena = imread('D:/Pycharm/ivclab/data/lena.tif')
+img_sail = imread('D:/Pycharm/ivclab/data/sail.tif')
 
-# RGB → YCbCr
-ycbcr = rgb2ycbcr(image)
-Y, Cb, Cr = ycbcr[..., 0], ycbcr[..., 1], ycbcr[..., 2]
+img_lena_rec = yuv420compression(img_lena)
+img_sail_rec = yuv420compression(img_sail)
 
-# Assume Cb is a chroma plane
-H, W = Cb.shape
+psnr_lena = calc_psnr(img_lena, img_lena_rec)
+psnr_sail = calc_psnr(img_sail, img_sail_rec)
 
-# Pad manually
-Cb_padded = np.pad(Cb, ((4, 4), (4, 4)), mode='symmetric')
-
-# Resample
-Cb_half_w = resample(Cb_padded, num=Cb_padded.shape[1] // 2, axis=1)  # horizontal
-Cb_half_hw = resample(Cb_half_w, num=Cb_half_w.shape[0] // 2, axis=0)  # vertical
-
-# Crop manually
-Cb_result = np.round(Cb_half_hw[2:-2, 2:-2])
+print(f'PSNR of lena is {psnr_lena:.3f} dB\n')
+print(f'PSNR of sail is {psnr_sail:.3f} dB\n')

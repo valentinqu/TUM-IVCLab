@@ -1,5 +1,6 @@
+from ivclab import min_code_length
 from ivclab.utils import imread
-from ivclab.entropy import stats_marg, calc_entropy
+from ivclab.entropy import stats_marg, calc_entropy, min_code_length
 
 import numpy as np
 
@@ -13,8 +14,9 @@ image_names = ['lena.tif', 'sail.tif', 'smandril.tif']
 
 # read images
 for image_name in image_names:
-    img = imread(f'data/{image_name}')
+    img = imread(f'D:/Pycharm/ivclab/data/{image_name}')
     pmf_img = stats_marg(img, np.arange(256))
+
     entropy_img = calc_entropy(pmf_img)
 
     print(f"Entropy of {image_name}: H={entropy_img:.2f} bits/pixel")

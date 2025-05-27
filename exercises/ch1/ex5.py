@@ -2,7 +2,7 @@ from ivclab.utils import imread, calc_psnr
 from ivclab.image import yuv420compression
 import numpy as np
 
-image = imread('data/satpic1.bmp')
+image = imread('D:/Pycharm/ivclab/data/sail.tif')
 
 recon_image = yuv420compression(image)
 

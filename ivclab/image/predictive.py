@@ -24,7 +24,11 @@ def single_pixel_predictor(image):
     residual_image = np.zeros_like(image)
 
     # YOUR CODE STARTS HERE
+    # First column: copy original image (no left neighbor)
+    residual_image[:, 0, :] = image[:, 0, :]
 
+    # Other columns: compute residual (current pixel - left neighbor pixel)
+    residual_image[:, 1:, :] = image[:, 1:, :] - a1 * image[:, :-1, :]
 
     # YOUR CODE ENDS HERE
 
@@ -65,16 +69,23 @@ def _predict_from_neighbors(original, coefficients):
     residual_error = np.copy(reconstruction)
 
     # YOUR CODE STARTS HERE
-    
+    a1, a2, a3 = coefficients
+    for h in range(1, H):
+        for w in range(1, W):
+            for c in range(C):
+                neighbor_left = reconstruction[h, w - 1, c]  # S1
+                neighbor_top = reconstruction[h - 1, w, c]  # S2
+                neighbor_topleft = reconstruction[h - 1, w - 1, c]  # S3
 
+                prediction = a1 * neighbor_left + a2 * neighbor_top + a3 * neighbor_topleft
 
+                error = original[h, w, c] - prediction
 
+                error_rounded = np.round(error)
 
+                residual_error[h, w, c] = error_rounded
 
-
-
-
-
+                reconstruction[h, w, c] = prediction + error_rounded
     # YOUR CODE STARTS HERE
 
     return residual_error
@@ -103,23 +114,23 @@ def three_pixels_predictor(image, subsample_color_channels=False):
     coefficients_CbCr = [3/8, -2/8, 7/8]
 
     # YOUR CODE STARTS HERE
-    
+    image_ycbcr = rgb2ycbcr(image)
 
+    Y = image_ycbcr[:, :, 0:1]
+    Cb = image_ycbcr[:, :, 1:2]
+    Cr = image_ycbcr[:, :, 2:3]
 
+    if subsample_color_channels:
+        Cb = decimate(Cb, 2, axis=0, ftype='iir')
+        Cb = decimate(Cb, 2, axis=1, ftype='iir')
+        Cr = decimate(Cr, 2, axis=0, ftype='iir')
+        Cr = decimate(Cr, 2, axis=1, ftype='iir')
+    residual_image_Y = _predict_from_neighbors(Y, coefficients_Y)
 
+    residual_image_Cb = _predict_from_neighbors(Cb, coefficients_CbCr)
+    residual_image_Cr = _predict_from_neighbors(Cr, coefficients_CbCr)
 
-
-
-
-
-
-
-
-
-
-
-
-    
+    residual_image_CbCr = np.concatenate((residual_image_Cb, residual_image_Cr), axis=2)
     # YOUR CODE ENDS HERE
 
     residual_image_Y = np.round(np.clip(residual_image_Y, -255, 255)).astype(np.int32)

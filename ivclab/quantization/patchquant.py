@@ -54,9 +54,14 @@ class PatchQuant:
             quantized_img: np.array of shape [H_patch, W_patch, C, H_window, W_window]
         """
         # YOUR CODE STARTS HERE
-        
+        quant_table = self.get_quantization_table()  # shape: [3, 8, 8]
 
+        quantized_img = np.zeros_like(patched_img)
 
+        for c in range(3):  # 对每个颜色通道分别处理
+            quantized_img[:, :, c, :, :] = np.round(
+                patched_img[:, :, c, :, :] / quant_table[c]
+            )
 
         # YOUR CODE ENDS HERE
         return quantized_img.astype(np.int32)
@@ -74,7 +79,12 @@ class PatchQuant:
             patched_img: np.array of shape [H_patch, W_patch, C, H_window, W_window]
         """
         # YOUR CODE STARTS HERE
-        
+        quant_table = self.get_quantization_table()  # shape: [3, 8, 8]
+
+        quantized_img = np.zeros_like(patched_img, dtype=np.float32)
+
+        for c in range(3):
+            quantized_img[:, :, c, :, :] = patched_img[:, :, c, :, :] * quant_table[c]
 
 
         
