@@ -5,11 +5,11 @@ from ivclab.utils import imread, calc_psnr
 import matplotlib.pyplot as plt
 
 
-lena_small = imread('data/lena_small.tif')
+lena_small = imread(f'D:/Pycharm/ivclab/data/lena_small.tif')
 
 images = []
 for i in range(20,40 + 1):
-    images.append(imread(f'data/foreman20_40_RGB/foreman00{i}.bmp'))
+    images.append(imread(f'D:/Pycharm/ivclab/data/foreman20_40_RGB/foreman00{i}.bmp'))
 
 all_bpps = list()
 all_psnrs = list()
@@ -17,6 +17,7 @@ all_psnrs = list()
 for q_scale in [0.07, 0.2, 0.4, 0.8, 1.0, 1.5, 2, 3, 4, 4.5]:
     video_codec = VideoCodec(quantization_scale=q_scale, bounds=(-1000, 4000), end_of_block=4000, block_shape=(8,8), search_range=4)
     video_codec.intra_codec.train_huffman_from_image(lena_small, is_source_rgb=True)
+    video_codec.residual_codec.train_huffman_from_image(lena_small, is_source_rgb=True)
     bpps = list()
     psnrs = list()
     for frame_num, image in enumerate(images):
@@ -40,12 +41,12 @@ for q_scale in [0.07, 0.2, 0.4, 0.8, 1.0, 1.5, 2, 3, 4, 4.5]:
 ch4_bpps = np.array(all_bpps)
 ch4_psnrs = np.array(all_psnrs)
 
-np.save('ch5_bpps.npy', ch4_bpps)
-np.save('ch5_psnrs.npy', ch4_psnrs)
+np.save('data/ch5_bpps.npy', ch4_bpps)
+np.save('data/ch5_psnrs.npy', ch4_psnrs)
 
 images = []
 for i in range(20,40 + 1):
-    images.append(imread(f'data/foreman20_40_RGB/foreman00{i}.bmp'))
+    images.append(imread(f'D:/Pycharm/ivclab/data/foreman20_40_RGB/foreman00{i}.bmp'))
 
 all_bpps = list()
 all_PSNRs = list()
@@ -74,10 +75,10 @@ for q_scale in [0.15,0.3,0.7,1.0,1.5,3,5,7,10]:
 ch3_bpps = np.array(all_bpps)
 ch3_psnrs = np.array(all_PSNRs)
 
-gt_ch3_bpps = np.load('data/ch3_bpps.npy')
-gt_ch3_psnrs = np.load('data/ch3_psnrs.npy')
-gt_ch4_bpps = np.load('data/ch4_bpps.npy')
-gt_ch4_psnrs = np.load('data/ch4_psnrs.npy')
+gt_ch3_bpps = np.load(f'D:/Pycharm/ivclab/data/ch3_bpps.npy')
+gt_ch3_psnrs = np.load(f'D:/Pycharm/ivclab/data/ch3_psnrs.npy')
+gt_ch4_bpps = np.load(f'D:/Pycharm/ivclab/data/ch4_bpps.npy')
+gt_ch4_psnrs = np.load(f'D:/Pycharm/ivclab/data/ch4_psnrs.npy')
 
 plt.figure()
 plt.plot(ch4_bpps, ch4_psnrs, marker='o', linestyle='-', label='Video Codec')

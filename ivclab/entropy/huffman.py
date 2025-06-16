@@ -39,6 +39,11 @@ class HuffmanCoder:
 
         return np.asarray(decoded)
 
+    def get_codeword_lengths(self):
+        if self.encoder_codebook is None:
+            raise ValueError("Train Huffman coder first.")
+        return self.encoder_codebook.get_code_lens()
+
 
 if __name__ == '__main__':
     huffman = HuffmanCoder()
@@ -53,4 +58,9 @@ if __name__ == '__main__':
     print(f"Bitrate: {bitrate}")
 
     decoded_message = huffman.decode(compressed, message_length=len(message))
-    print(decoded_message == message)
+    print(decoded_message)
+
+    codeword_lengths = huffman.get_codeword_lengths()
+    print(f"All codeword lengths: {codeword_lengths}")
+    print(f"Min codeword length: {np.min(codeword_lengths)}")
+    print(f"Max codeword length: {np.max(codeword_lengths)}")

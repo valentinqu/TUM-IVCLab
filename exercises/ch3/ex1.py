@@ -20,7 +20,7 @@ all_bpps = list()
 # YOUR CODE STARTS HERE
 quantization_scales = [0.15,0.3,0.7,1.0,1.5,3,5,7,10]
 for q in quantization_scales:
-    intracodec = IntraCodec(quantization_scale=q, bounds=(-255, 255))
+    intracodec = IntraCodec(quantization_scale=q)
 
     intracodec.train_huffman_from_image(lena_small)
 

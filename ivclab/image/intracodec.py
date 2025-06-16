@@ -26,6 +26,7 @@ class IntraCodec:
         self.zerorun = ZeroRunCoder(end_of_block=end_of_block, block_size= block_shape[0] * block_shape[1])
         self.huffman = HuffmanCoder(lower_bound=bounds[0])
         self.patcher = Patcher()
+        self.symbol_length = 0
 
     def image2symbols(self, img: np.array, is_source_rgb=True):
         """
@@ -77,6 +78,8 @@ class IntraCodec:
         idct_img = self.dct.inverse_transform(dequantized)
 
         reconstructed_img = self.patcher.unpatch(idct_img)
+
+        reconstructed_img = ycbcr2rgb(reconstructed_img)
         # YOUR CODE ENDS HERE
         return reconstructed_img
     
@@ -92,7 +95,7 @@ class IntraCodec:
         """
         # YOUR CODE STARTS HERE
         symbols = self.image2symbols(training_img, is_source_rgb=is_source_rgb)
-        pixel_range = np.arange(self.bounds[0], self.bounds[1])
+        pixel_range = np.arange(self.bounds[0], self.bounds[1]+2)
         pmf = stats_marg(symbols, pixel_range)
         self.huffman.train(pmf)
         # YOUR CODE ENDS HERE
@@ -110,6 +113,7 @@ class IntraCodec:
         # YOUR CODE STARTS HERE
         symbols = self.image2symbols(img, is_source_rgb=is_source_rgb)
         bitstream, bitrate = self.huffman.encode(symbols)
+        self.symbol_length = len(symbols)
 
         if return_bpp:
             return bitstream, bitrate
@@ -129,7 +133,7 @@ class IntraCodec:
 
         """
         # YOUR CODE STARTS HERE
-        decoded = self.huffman.decode(bitstream, message_length=np.prod(original_shape))
+        decoded = self.huffman.decode(bitstream, message_length=self.symbol_length)
         reconstructed_img = self.symbols2image(decoded, original_shape)
         # YOUR CODE ENDS HERE
         return reconstructed_img
@@ -140,7 +144,7 @@ if __name__ == "__main__":
 
     lena = imread(f'D:/Pycharm/ivclab/data/lena.tif')
     lena_small = imread(f'D:/Pycharm/ivclab/data/lena_small.tif')
-    intracodec = IntraCodec(quantization_scale=0.15)
+    intracodec = IntraCodec(quantization_scale=0.7)
     intracodec.train_huffman_from_image(lena_small)
 
     symbols, bitsize = intracodec.intra_encode(lena, return_bpp=True)

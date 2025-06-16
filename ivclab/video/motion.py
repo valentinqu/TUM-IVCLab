@@ -21,24 +21,30 @@ class MotionCompensator:
             motion_vector: np.array of shape [H / 8, W / 8, 1]
         """
         # YOUR CODE STARTS HERE
+        H, W = ref_image.shape
+        motion_vector = np.zeros((H // 8, W // 8, 1), dtype=int)
+        R = self.search_range
+        offset = (2 * R + 1)
 
-       
+        for i in range(0, H, 8):
+            for j in range(0, W, 8):
+                best_ssd = np.inf
+                best_dx, best_dy = 0, 0
+                target_block = image[i:i + 8, j:j + 8]
 
+                for dy in range(-R, R + 1):
+                    for dx in range(-R, R + 1):
+                        ref_i = i + dy
+                        ref_j = j + dx
+                        if 0 <= ref_i < H - 7 and 0 <= ref_j < W - 7:
+                            ref_block = ref_image[ref_i:ref_i + 8, ref_j:ref_j + 8]
+                            ssd = np.sum((ref_block - target_block) ** 2)
+                            if ssd < best_ssd:
+                                best_ssd = ssd
+                                best_dx, best_dy = dx, dy
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                mv_value = best_dy * offset + best_dx
+                motion_vector[i // 8, j // 8, 0] = mv_value
         # YOUR CODE ENDS HERE
 
         return motion_vector.astype(int)
@@ -59,6 +65,23 @@ class MotionCompensator:
         image = np.zeros_like(ref_image)
 
         # YOUR CODE STARTS HERE
-        raise NotImplementedError()
+        H, W, C = ref_image.shape
+        R = self.search_range
+        offset = 2 * R + 1
+        image = np.zeros_like(ref_image)
+
+        for i in range(0, H, 8):
+            for j in range(0, W, 8):
+                mv_value = motion_vector[i // 8, j // 8, 0]
+                dx = mv_value % offset
+                dy = mv_value // offset
+                dx -= R
+                dy -= R
+
+                ref_i = i + dy
+                ref_j = j + dx
+
+                if 0 <= ref_i < H - 7 and 0 <= ref_j < W - 7:
+                    image[i:i + 8, j:j + 8, :] = ref_image[ref_i:ref_i + 8, ref_j:ref_j + 8, :]
         # YOUR CODE ENDS HERE
         return image
